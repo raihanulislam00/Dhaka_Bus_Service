@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from '../src/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as path from 'path';
-import { NestExpressApplication } from '@nestjs/platform-express';
+import { INestApplication } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create(AppModule);
   
   // Enable CORS for frontend
   app.enableCors({
@@ -26,11 +26,6 @@ async function bootstrap() {
     whitelist: true,
   }));
 
-  // Serve static files
-  app.useStaticAssets(path.join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/',
-  });
-
   // Set global prefix for API routes
   app.setGlobalPrefix('api');
 
@@ -40,9 +35,11 @@ async function bootstrap() {
 }
 
 // For Vercel serverless deployment
+let cachedApp: INestApplication;
+
 export default async (req: any, res: any) => {
-  if (!global.app) {
-    const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  if (!cachedApp) {
+    const app = await NestFactory.create(AppModule);
     
     app.enableCors({
       origin: [
@@ -61,17 +58,13 @@ export default async (req: any, res: any) => {
       whitelist: true,
     }));
 
-    app.useStaticAssets(path.join(__dirname, '..', 'uploads'), {
-      prefix: '/uploads/',
-    });
-
     app.setGlobalPrefix('api');
     
     await app.init();
-    global.app = app;
+    cachedApp = app;
   }
 
-  return global.app.getHttpAdapter().getInstance()(req, res);
+  return cachedApp.getHttpAdapter().getInstance()(req, res);
 };
 
 // For local development

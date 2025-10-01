@@ -12,9 +12,10 @@
     "backend"
   ],
   "dependencies": {
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/core": "^11.1.6",
     "@nestjs/platform-express": "^11.1.6"
   },
-  "devDependencies": {},
   "engines": {
     "node": ">=18.0.0"
   }

@@ -230,7 +230,21 @@ export default function RegisterPage({ userType }: RegisterPageProps) {
       
     } catch (err: any) {
       console.error('Registration error:', err);
-      const errorMessage = err.response?.data?.message || 'Registration failed. Please try again.';
+      
+      let errorMessage = 'Registration failed. Please try again.';
+      
+      if (err.code === 'NETWORK_ERROR' || err.message === 'Network Error') {
+        errorMessage = 'Network error. Please check your connection and try again.';
+      } else if (err.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (err.response?.status === 404) {
+        errorMessage = 'API endpoint not found. The backend service may be down.';
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.message?.includes('Authentication Required')) {
+        errorMessage = 'API access is restricted. Please contact support.';
+      }
+      
       setError(errorMessage);
     } finally {
       setLoading(false);
