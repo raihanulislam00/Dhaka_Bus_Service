@@ -38,6 +38,7 @@ exports.AppModule = AppModule = __decorate([
             }),
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'postgres',
+                url: process.env.DATABASE_URL,
                 host: process.env.DB_HOST || 'localhost',
                 port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
                 username: process.env.DB_USERNAME || 'postgres',
@@ -45,7 +46,8 @@ exports.AppModule = AppModule = __decorate([
                 database: process.env.DB_NAME || 'passenger',
                 autoLoadEntities: true,
                 entities: [driver_1.Driver, passenger_entities_1.Passenger, ticket_entity_1.Ticket, admin_entity_1.AdminEntity, route_entity_1.RouteEntity, schedule_entity_1.ScheduleEntity],
-                synchronize: true,
+                synchronize: process.env.NODE_ENV !== 'production',
+                ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
                 retryAttempts: 3,
                 retryDelay: 3000,
             }),
