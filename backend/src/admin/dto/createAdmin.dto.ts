@@ -5,6 +5,12 @@ import {
 } from 'class-validator';
 
 export class CreateAdminDto {
+  @IsNotEmpty({ message: 'Username is required' })
+  @IsString({ message: 'Username must be a string' })
+  @MinLength(3, { message: 'Username must be at least 3 characters long' })
+  @MaxLength(50, { message: 'Username must not exceed 50 characters' })
+  username: string;
+
   @IsNotEmpty({ message: 'Name is required' })
   @IsString({ message: 'Name must be a string' })
   @MinLength(3, { message: 'Name must be at least 3 characters long' })

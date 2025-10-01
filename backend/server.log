@@ -1,0 +1,85 @@
+🚀 Starting stable backend server...
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +88ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassportModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigHostModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJwtModule dependencies initialized[39m[38;5;3m +0ms[39m
+Email credentials not configured. Email service will be disabled.
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mConfigModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mServeStaticModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmCoreModule dependencies initialized[39m[38;5;3m +185ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTypeOrmModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mDriverModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAdminModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mPassengerModule dependencies initialized[39m[38;5;3m +0ms[39m
+📡 Server will listen on localhost:3000...
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAppController {/}:[39m[38;5;3m +4ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/, GET} route[39m[38;5;3m +2ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mDriverController {/driver}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/driver/file, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/driver/:id, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/driver, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/driver/nid/:name, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/driver/:id/status, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/driver/inactive, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/driver/older-than/:age, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/driver/register, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/driver/login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/driver/schedules/available, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/driver/:id/schedules, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/driver/:driverId/schedules/:scheduleId/select, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/driver/:driverId/schedules/:scheduleId/unselect, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/driver/routes/all, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mPassengerController {/passenger}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/passenger/login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/passenger/:id/tickets, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/passenger/:id/tickets, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/passenger/:passengerId/tickets/:ticketId, DELETE} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/passenger/tickets/:ticketId/status, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/passenger, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/passenger/all, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/passenger/search/fullname, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/passenger/username/:username, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/passenger/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/passenger/:id, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/passenger/username/:username, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/passenger/:id, DELETE} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/passenger/upload/:id, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/passenger/photo/:filename, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAdminController {/admin}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/defaultCountry, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/register, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/:id, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/:id/country, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/byJoiningDate/:date, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/registerWithPhoto, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/login, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/routes, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/routes/search, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/routes/active, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/routes, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/routes/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/routes/:id, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/routes/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/routes/:id/toggle, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/schedules, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/schedules, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/schedules/route/:routeId, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/schedules/available, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/schedules/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/schedules/:id, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/schedules/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/schedules/:id/assign-driver/:driverId, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/schedules/:id/unassign-driver, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/admin/schedules/:id/toggle, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 47370  - [39m10/01/2025, 3:26:59 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +3ms[39m
+✅ Stable server running on http://localhost:3000
+🔄 Use Ctrl+C to stop

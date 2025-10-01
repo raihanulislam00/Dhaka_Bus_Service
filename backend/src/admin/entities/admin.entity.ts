@@ -1,5 +1,6 @@
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { v4 as uuidv4 } from 'uuid';
+import * as bcrypt from 'bcrypt';
 
 @Entity('admin')
 export class AdminEntity {
@@ -8,6 +9,9 @@ export class AdminEntity {
     
     @Column({ type: 'varchar', length: 150, unique: true })
     uniqueId: string;
+
+    @Column({ type: 'varchar', length: 50, unique: true })
+    username: string;
     
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     joiningDate: Date;
@@ -29,11 +33,26 @@ export class AdminEntity {
     
     @Column({ type: 'varchar', length: 200, nullable: true })
     photoPath?: string;
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
     
-  @BeforeInsert()
-    generateUuid() {
+    @BeforeInsert()
+    async generateUuid() {
         if (!this.uniqueId) {
             this.uniqueId = uuidv4();
         }
-}
+        
+        if (this.password) {
+            const salt = await bcrypt.genSalt();
+            this.password = await bcrypt.hash(this.password, salt);
+        }
+    }
+
+    async validatePassword(password: string): Promise<boolean> {
+        return bcrypt.compare(password, this.password);
+    }
 }

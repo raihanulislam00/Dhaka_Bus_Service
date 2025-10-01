@@ -8,24 +8,36 @@ export class EmailService {
   private transporter: nodemailer.Transporter;
 
   constructor(private configService: ConfigService) {
+    // Initialize email service
     this.createTransporter();
   }
 
   private async createTransporter() {
     try {
+      const emailUser = this.configService.get('EMAIL_USER');
+      const emailPass = this.configService.get('EMAIL_PASSWORD');
+
+      // Only create transporter if email credentials are provided
+      if (!emailUser || !emailPass) {
+        console.log('Email credentials not configured. Email service will be disabled.');
+        return;
+      }
+
       this.transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-          user: this.configService.get('EMAIL_USER'),
-          pass: this.configService.get('EMAIL_PASSWORD'),
+          user: emailUser,
+          pass: emailPass,
         },
       });
 
-      // Verify the connection
+      // Verify the connection (but don't fail if it fails)
       await this.transporter.verify();
       console.log('SMTP connection established successfully');
     } catch (error) {
       console.error('Error creating email transporter:', error);
+      console.log('Email service will continue without SMTP verification');
+      // Don't throw the error, just log it
     }
   }
 
@@ -57,6 +69,11 @@ export class EmailService {
     };
 
     try {
+      if (!this.transporter) {
+        console.log('Email service not configured. Skipping ticket confirmation email.');
+        return false;
+      }
+
       console.log('Attempting to send ticket confirmation email with options:', {
         to: mailOptions.to,
         from: mailOptions.from,
@@ -96,6 +113,11 @@ export class EmailService {
     };
 
     try {
+      if (!this.transporter) {
+        console.log('Email service not configured. Skipping password reset email.');
+        return false;
+      }
+
       await this.transporter.sendMail(mailOptions);
       return true;
     } catch (error) {

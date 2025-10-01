@@ -153,7 +153,7 @@ export class PassengerController {
     }))
     async uploadPhoto(
         @Param('id', ParseIntPipe) id: number,
-        @UploadedFile() file: Express.Multer.File
+        @UploadedFile() file: any
     ): Promise<Passenger> {
         if (!file) {
             throw new BadRequestException('Photo file is required and must be an image (jpg, jpeg, png, webp)');

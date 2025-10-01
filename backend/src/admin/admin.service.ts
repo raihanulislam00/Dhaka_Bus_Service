@@ -1,15 +1,18 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 import { AdminEntity } from './entities/admin.entity';
 import { CreateAdminDto } from './dto/createAdmin.dto';
 import { UpdateAdminDto } from './dto/updateAdmin.dto';
+import { LoginAdminDto } from './dto/login-admin.dto';
 
 @Injectable()
 export class AdminService {
   constructor(
     @InjectRepository(AdminEntity) 
     private adminRepository: Repository<AdminEntity>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async findAll(): Promise<AdminEntity[]> {
@@ -72,5 +75,60 @@ export class AdminService {
       throw new NotFoundException('Photo not found for this admin');
     }
     return admin.photoPath;
+  }
+
+  // Authentication methods
+  async register(createAdminDto: CreateAdminDto): Promise<AdminEntity> {
+    // Check if username already exists
+    const existingAdmin = await this.adminRepository.findOne({
+      where: { username: createAdminDto.username }
+    });
+
+    if (existingAdmin) {
+      throw new ConflictException(`Username '${createAdminDto.username}' already exists`);
+    }
+
+    const admin = this.adminRepository.create(createAdminDto);
+    return await this.adminRepository.save(admin);
+  }
+
+  async login(loginAdminDto: LoginAdminDto) {
+    const admin = await this.adminRepository.findOne({
+      where: { username: loginAdminDto.username }
+    });
+
+    if (!admin) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const isPasswordValid = await admin.validatePassword(loginAdminDto.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const payload = { username: admin.username, sub: admin.id, role: 'admin' };
+    const access_token = this.jwtService.sign(payload);
+    
+    return {
+      access_token,
+      admin: {
+        id: admin.id,
+        username: admin.username,
+        name: admin.name,
+        mail: admin.mail
+      }
+    };
+  }
+
+  async findByUsername(username: string): Promise<AdminEntity> {
+    const admin = await this.adminRepository.findOne({
+      where: { username }
+    });
+
+    if (!admin) {
+      throw new NotFoundException(`Admin with username '${username}' not found`);
+    }
+
+    return admin;
   }
 }
