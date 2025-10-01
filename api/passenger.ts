@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../../backend/src/app.module';
+// Update the path below to the correct location of app.module.ts
+import { AppModule } from '../backend/src/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 

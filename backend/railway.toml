@@ -1,0 +1,10 @@
+# Railway Configuration
+
+## Required Node.js version for this project
+NODE_VERSION=18.20.8
+
+## Build settings
+NPM_VERSION=10.8.2
+
+## Environment
+NODE_ENV=production
