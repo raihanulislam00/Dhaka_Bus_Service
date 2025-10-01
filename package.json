@@ -1,5 +1,21 @@
 {
+  "name": "dhaka-bus-service",
+  "version": "1.0.0",
+  "description": "Smart Bus Portal with Next.js frontend and NestJS backend",
+  "scripts": {
+    "build": "cd frontend && npm run build",
+    "dev": "cd frontend && npm run dev",
+    "start": "cd frontend && npm run start"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "dependencies": {
     "@nestjs/platform-express": "^11.1.6"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

@@ -2,11 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: 'standalone',
-  experimental: {
-    turbo: {
-      loaders: {
-        '.svg': ['@svgr/webpack'],
-      },
+  outputFileTracingRoot: process.cwd(),
+  turbopack: {
+    rules: {
+      '*.svg': ['@svgr/webpack'],
     },
   },
   env: {
