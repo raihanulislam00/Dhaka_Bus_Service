@@ -19,6 +19,8 @@ let Ticket = class Ticket {
     price;
     journeyDate;
     status;
+    scheduleId;
+    bookingGroupId;
     passenger;
     createdAt;
     updatedAt;
@@ -48,6 +50,14 @@ __decorate([
     (0, typeorm_1.Column)({ default: 'pending' }),
     __metadata("design:type", String)
 ], Ticket.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", Number)
+], Ticket.prototype, "scheduleId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Ticket.prototype, "bookingGroupId", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => passenger_entities_1.Passenger, passenger => passenger.tickets),
     __metadata("design:type", passenger_entities_1.Passenger)

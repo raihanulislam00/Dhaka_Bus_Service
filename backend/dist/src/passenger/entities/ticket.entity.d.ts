@@ -6,6 +6,8 @@ export declare class Ticket {
     price: number;
     journeyDate: Date;
     status: string;
+    scheduleId: number;
+    bookingGroupId: string;
     passenger: Passenger;
     createdAt: Date;
     updatedAt: Date;

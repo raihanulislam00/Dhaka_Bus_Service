@@ -94,6 +94,89 @@ export class EmailService {
     }
   }
 
+  async sendMultipleTicketConfirmation(
+    to: string,
+    bookingDetails: {
+      bookingGroupId: string;
+      tickets: Array<{
+        ticketId: string;
+        seatNumber: string;
+        price: number;
+      }>;
+      journeyDate: Date;
+      destination: string;
+      totalPrice: number;
+      seatCount: number;
+    },
+  ) {
+    const ticketRows = bookingDetails.tickets
+      .map(ticket => 
+        `<tr>
+          <td>${ticket.ticketId}</td>
+          <td>${ticket.seatNumber}</td>
+          <td>৳${ticket.price}</td>
+        </tr>`
+      )
+      .join('');
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to,
+      subject: 'Multiple Bus Tickets Confirmation',
+      html: `
+        <h1>Multiple Tickets Booking Confirmation</h1>
+        <p>Dear Passenger,</p>
+        <p>Your bus tickets have been confirmed. Here are the details:</p>
+        
+        <div style="margin: 20px 0;">
+          <strong>Booking Group ID:</strong> ${bookingDetails.bookingGroupId}<br>
+          <strong>Journey Date:</strong> ${new Date(bookingDetails.journeyDate).toLocaleDateString()}<br>
+          <strong>Route:</strong> ${bookingDetails.destination}<br>
+          <strong>Total Seats:</strong> ${bookingDetails.seatCount}<br>
+        </div>
+
+        <table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+          <thead>
+            <tr style="background-color: #f2f2f2;">
+              <th style="border: 1px solid #ddd; padding: 8px;">Ticket ID</th>
+              <th style="border: 1px solid #ddd; padding: 8px;">Seat Number</th>
+              <th style="border: 1px solid #ddd; padding: 8px;">Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${ticketRows}
+          </tbody>
+        </table>
+        
+        <div style="margin: 20px 0; font-size: 18px; font-weight: bold;">
+          <strong>Total Amount: ৳${bookingDetails.totalPrice}</strong>
+        </div>
+        
+        <p>Please keep this confirmation for your records.</p>
+        <p>Thank you for choosing our service!</p>
+      `,
+    };
+
+    try {
+      if (!this.transporter) {
+        console.log('Email service not configured. Skipping multiple ticket confirmation email.');
+        return false;
+      }
+
+      console.log('Attempting to send multiple ticket confirmation email with options:', {
+        to: mailOptions.to,
+        from: mailOptions.from,
+        subject: mailOptions.subject
+      });
+      const result = await this.transporter.sendMail(mailOptions);
+      console.log('Multiple ticket confirmation email sent successfully:', result);
+      return true;
+    } catch (error) {
+      console.error('Error sending multiple ticket confirmation email - Full error:', error);
+      return false;
+    }
+  }
+
   async sendPasswordReset(to: string, resetToken: string) {
     const mailOptions = {
       from: process.env.EMAIL_USER,

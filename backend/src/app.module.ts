@@ -13,35 +13,52 @@ import { Ticket } from './passenger/entities/ticket.entity';
 import { AdminEntity } from './admin/entities/admin.entity';
 import { RouteEntity } from './admin/entities/route.entity';
 import { ScheduleEntity } from './admin/entities/schedule.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET || 'dhaka-bus-service-secret-key',
       signOptions: { expiresIn: '24h' },
     }),
-    ...(process.env.DATABASE_URL ? [
-      TypeOrmModule.forRoot({
-        type: 'postgres',
-        url: process.env.DATABASE_URL,
-        host: process.env.DB_HOST || 'localhost',
-        port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
-        username: process.env.DB_USERNAME || 'postgres',
-        password: process.env.DB_PASSWORD || '12345678',
-        database: process.env.DB_NAME || 'passenger',
-        autoLoadEntities: true,
-        entities: [Driver, Passenger, Ticket, AdminEntity, RouteEntity, ScheduleEntity],
-        synchronize: process.env.NODE_ENV !== 'production',
-        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-        retryAttempts: 3,
-        retryDelay: 3000,
-        logging: process.env.NODE_ENV !== 'production',
-      })
-    ] : []),
+    TypeOrmModule.forRoot(
+      process.env.DATABASE_URL
+        ? {
+            // PostgreSQL configuration for production (Railway)
+            type: 'postgres',
+            url: process.env.DATABASE_URL,
+            autoLoadEntities: true,
+            entities: [Driver, Passenger, Ticket, AdminEntity, RouteEntity, ScheduleEntity],
+            synchronize: true,
+            ssl: { rejectUnauthorized: false },
+            retryAttempts: 5,
+            retryDelay: 3000,
+            logging: ['error'],
+            extra: {
+              ssl: {
+                rejectUnauthorized: false
+              }
+            },
+          }
+        : {
+            // SQLite configuration for development
+            type: 'sqlite',
+            database: './dhaka_bus_service.sqlite',
+            autoLoadEntities: true,
+            entities: [Driver, Passenger, Ticket, AdminEntity, RouteEntity, ScheduleEntity],
+            synchronize: true,
+            logging: process.env.NODE_ENV !== 'production',
+          }
+    ),
     DriverModule,
     PassengerModule,
     AdminModule,

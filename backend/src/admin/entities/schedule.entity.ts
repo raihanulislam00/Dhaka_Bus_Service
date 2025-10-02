@@ -16,13 +16,13 @@ export class ScheduleEntity {
   @Column({ length: 50 })
   busNumber: string;
 
-  @Column('time')
+  @Column({ type: 'varchar', length: 10 })
   departureTime: string;
 
-  @Column('time')
+  @Column({ type: 'varchar', length: 10 })
   arrivalTime: string;
 
-  @Column({ type: 'enum', enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] })
+  @Column({ type: 'varchar', length: 20 })
   dayOfWeek: string;
 
   @Column('int', { default: 45 })

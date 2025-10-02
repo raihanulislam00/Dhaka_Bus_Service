@@ -40,7 +40,11 @@ async function seedRoutes() {
     ];
     try {
         for (const routeData of sampleRoutes) {
-            await routeService.create(routeData);
+            const routeDto = {
+                ...routeData,
+                stops: JSON.stringify(routeData.stops)
+            };
+            await routeService.create(routeDto);
             console.log(`Created route: ${routeData.name}`);
         }
         console.log('✅ Sample routes created successfully');

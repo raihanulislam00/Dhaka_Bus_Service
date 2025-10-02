@@ -36,7 +36,7 @@ export declare class DriverService {
             id: number;
             username: string;
             fullName: string;
-            status: "active" | "inactive";
+            status: "inactive" | "active";
         };
     }>;
     findByUsername(username: string): Promise<Driver>;

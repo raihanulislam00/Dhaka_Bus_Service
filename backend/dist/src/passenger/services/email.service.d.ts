@@ -10,5 +10,17 @@ export declare class EmailService {
         destination: string;
         seatNumber: string;
     }): Promise<boolean>;
+    sendMultipleTicketConfirmation(to: string, bookingDetails: {
+        bookingGroupId: string;
+        tickets: Array<{
+            ticketId: string;
+            seatNumber: string;
+            price: number;
+        }>;
+        journeyDate: Date;
+        destination: string;
+        totalPrice: number;
+        seatCount: number;
+    }): Promise<boolean>;
     sendPasswordReset(to: string, resetToken: string): Promise<boolean>;
 }

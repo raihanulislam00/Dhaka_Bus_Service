@@ -18,5 +18,6 @@ export declare class ScheduleService {
     assignDriver(scheduleId: number, driverId: number): Promise<ScheduleEntity>;
     unassignDriver(scheduleId: number): Promise<ScheduleEntity>;
     toggleActive(id: number): Promise<ScheduleEntity>;
+    findAvailableForBooking(): Promise<ScheduleEntity[]>;
     private checkTimeConflict;
 }

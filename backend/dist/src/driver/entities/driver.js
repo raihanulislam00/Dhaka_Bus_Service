@@ -73,8 +73,8 @@ __decorate([
 ], Driver.prototype, "age", void 0);
 __decorate([
     (0, typeorm_1.Column)({
-        type: 'enum',
-        enum: ['active', 'inactive'],
+        type: 'varchar',
+        length: 20,
         default: 'inactive',
     }),
     __metadata("design:type", String)
@@ -88,7 +88,7 @@ __decorate([
     __metadata("design:type", Number)
 ], Driver.prototype, "currentLongitude", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'timestamp', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'datetime', nullable: true }),
     __metadata("design:type", Date)
 ], Driver.prototype, "lastLocationUpdate", void 0);
 __decorate([

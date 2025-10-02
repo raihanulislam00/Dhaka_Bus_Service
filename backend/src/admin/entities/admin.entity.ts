@@ -13,7 +13,7 @@ export class AdminEntity {
     @Column({ type: 'varchar', length: 50, unique: true })
     username: string;
     
-    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
     joiningDate: Date;
     
     @Column({ type: 'varchar', length: 30, default: 'Unknown' })

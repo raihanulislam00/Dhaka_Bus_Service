@@ -42,9 +42,8 @@ __decorate([
     __metadata("design:type", String)
 ], CreateRouteDto.prototype, "endLocation", void 0);
 __decorate([
-    (0, class_validator_1.IsArray)(),
-    (0, class_validator_1.IsString)({ each: true }),
-    __metadata("design:type", Array)
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
 ], CreateRouteDto.prototype, "stops", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),

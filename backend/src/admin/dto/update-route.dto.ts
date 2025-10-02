@@ -20,9 +20,8 @@ export class UpdateRouteDto {
   endLocation?: string;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  stops?: string[];
+  @IsString()
+  stops?: string;
 
   @IsOptional()
   @IsNumber()

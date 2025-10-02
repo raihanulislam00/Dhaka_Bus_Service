@@ -7,4 +7,5 @@ export declare class UpdateScheduleDto {
     totalSeats?: number;
     notes?: string;
     assignedDriverId?: number;
+    availableSeats?: number;
 }

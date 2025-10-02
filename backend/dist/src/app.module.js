@@ -22,6 +22,8 @@ const ticket_entity_1 = require("./passenger/entities/ticket.entity");
 const admin_entity_1 = require("./admin/entities/admin.entity");
 const route_entity_1 = require("./admin/entities/route.entity");
 const schedule_entity_1 = require("./admin/entities/schedule.entity");
+const serve_static_1 = require("@nestjs/serve-static");
+const path_1 = require("path");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -31,29 +33,40 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
             }),
+            serve_static_1.ServeStaticModule.forRoot({
+                rootPath: (0, path_1.join)(__dirname, '..', 'uploads'),
+                serveRoot: '/uploads',
+            }),
             jwt_1.JwtModule.register({
                 global: true,
                 secret: process.env.JWT_SECRET || 'dhaka-bus-service-secret-key',
                 signOptions: { expiresIn: '24h' },
             }),
-            ...(process.env.DATABASE_URL ? [
-                typeorm_1.TypeOrmModule.forRoot({
+            typeorm_1.TypeOrmModule.forRoot(process.env.DATABASE_URL
+                ? {
                     type: 'postgres',
                     url: process.env.DATABASE_URL,
-                    host: process.env.DB_HOST || 'localhost',
-                    port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
-                    username: process.env.DB_USERNAME || 'postgres',
-                    password: process.env.DB_PASSWORD || '12345678',
-                    database: process.env.DB_NAME || 'passenger',
                     autoLoadEntities: true,
                     entities: [driver_1.Driver, passenger_entities_1.Passenger, ticket_entity_1.Ticket, admin_entity_1.AdminEntity, route_entity_1.RouteEntity, schedule_entity_1.ScheduleEntity],
-                    synchronize: process.env.NODE_ENV !== 'production',
-                    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-                    retryAttempts: 3,
+                    synchronize: true,
+                    ssl: { rejectUnauthorized: false },
+                    retryAttempts: 5,
                     retryDelay: 3000,
+                    logging: ['error'],
+                    extra: {
+                        ssl: {
+                            rejectUnauthorized: false
+                        }
+                    },
+                }
+                : {
+                    type: 'sqlite',
+                    database: './dhaka_bus_service.sqlite',
+                    autoLoadEntities: true,
+                    entities: [driver_1.Driver, passenger_entities_1.Passenger, ticket_entity_1.Ticket, admin_entity_1.AdminEntity, route_entity_1.RouteEntity, schedule_entity_1.ScheduleEntity],
+                    synchronize: true,
                     logging: process.env.NODE_ENV !== 'production',
-                })
-            ] : []),
+                }),
             driver_module_1.DriverModule,
             passenger_module_1.PassengerModule,
             admin_module_1.AdminModule,

@@ -21,6 +21,12 @@ export class Ticket {
     @Column({ default: 'pending' })
     status: string;
 
+    @Column({ nullable: true })
+    scheduleId: number;
+
+    @Column({ nullable: true })
+    bookingGroupId: string; // To group multiple seats booked together
+
     @ManyToOne(() => Passenger, passenger => passenger.tickets)
     passenger: Passenger;
 

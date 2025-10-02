@@ -19,6 +19,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { CreateMultipleTicketsDto } from './dto/create-multiple-tickets.dto';
 import { UpdateTicketStatusDto } from './dto/update-ticket-status.dto';
 import { LoginDto } from './dto/login.dto';
 import { PassengerService } from './passenger.service';
@@ -28,10 +29,16 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterError } from 'multer';
 import { diskStorage } from 'multer';
 import { Passenger } from './entities/passenger.entities';
+import { RouteService } from '../admin/services/route.service';
+import { ScheduleService } from '../admin/services/schedule.service';
 
 @Controller('passenger')
 export class PassengerController {
-    constructor(private readonly passengerService: PassengerService) {}
+    constructor(
+        private readonly passengerService: PassengerService,
+        private readonly routeService: RouteService,
+        private readonly scheduleService: ScheduleService,
+    ) {}
 
     @Post('login')
     @HttpCode(HttpStatus.OK)
@@ -49,9 +56,24 @@ export class PassengerController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Post(':id/tickets/multiple')
+    async createMultipleTickets(
+        @Param('id', ParseIntPipe) passengerId: number,
+        @Body() createMultipleTicketsDto: CreateMultipleTicketsDto
+    ) {
+        return await this.passengerService.createMultipleTickets(passengerId, createMultipleTicketsDto);
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Get(':id/tickets')
     async getPassengerTickets(@Param('id', ParseIntPipe) passengerId: number) {
         return await this.passengerService.getPassengerTickets(passengerId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get(':id/tickets/grouped')
+    async getPassengerTicketsGrouped(@Param('id', ParseIntPipe) passengerId: number) {
+        return await this.passengerService.getPassengerTicketsGrouped(passengerId);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -61,6 +83,15 @@ export class PassengerController {
         @Param('ticketId', ParseIntPipe) ticketId: number
     ) {
         return await this.passengerService.cancelTicket(passengerId, ticketId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete(':passengerId/booking-groups/:bookingGroupId')
+    async cancelBookingGroup(
+        @Param('passengerId', ParseIntPipe) passengerId: number,
+        @Param('bookingGroupId') bookingGroupId: string
+    ) {
+        return await this.passengerService.cancelBookingGroup(passengerId, bookingGroupId);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -165,6 +196,38 @@ export class PassengerController {
     @Get('photo/:filename')
     getPhoto(@Param('filename') filename: string, @Res() res) {
         res.sendFile(filename, { root: './uploads/photos' });
+    }
+
+    // Route endpoints for passengers
+    @Get('routes/available')
+    async getAvailableRoutes() {
+        return await this.routeService.findActive();
+    }
+
+    @Get('routes/search')
+    async searchRoutes(
+        @Query('start') startLocation?: string,
+        @Query('end') endLocation?: string,
+    ) {
+        if (!startLocation && !endLocation) {
+            return await this.routeService.findActive();
+        }
+        return await this.routeService.findByLocation(startLocation, endLocation);
+    }
+
+    @Get('routes/:id')
+    async getRouteDetails(@Param('id', ParseIntPipe) routeId: number) {
+        return await this.routeService.findOne(routeId);
+    }
+
+    @Get('routes/:id/schedules')
+    async getRouteSchedules(@Param('id', ParseIntPipe) routeId: number) {
+        return await this.scheduleService.findByRoute(routeId);
+    }
+
+    @Get('schedules/available')
+    async getAvailableSchedules() {
+        return await this.scheduleService.findAvailableForBooking();
     }
 }
 

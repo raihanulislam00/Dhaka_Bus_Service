@@ -6,7 +6,13 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   try {
+    console.log('🔧 Environment:', process.env.NODE_ENV || 'development');
+    console.log('🔧 Database URL exists:', !!process.env.DATABASE_URL);
+    console.log('🔧 Starting NestJS application...');
+    
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
+    
+    console.log('✅ NestJS application created successfully');
     
     // Enable CORS for frontend communication
     app.enableCors({
@@ -26,9 +32,13 @@ async function bootstrap() {
       allowedHeaders: ['Content-Type', 'Authorization'],
     });
     
-    app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-      prefix: '/uploads/',
-    });
+    console.log('✅ CORS configured');
+    
+    // Only configure static assets if not using ServeStaticModule
+    // app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    //   prefix: '/uploads/',
+    // });
+    
     app.useGlobalPipes(new ValidationPipe({
        whitelist: true,
         forbidNonWhitelisted: true,
@@ -36,19 +46,20 @@ async function bootstrap() {
         disableErrorMessages: false,
     }));
     
+    console.log('✅ Global pipes configured');
+    
     const port = process.env.PORT ?? 3000;
-    console.log('🚀 Backend server starting on port', port);
+    console.log('🚀 Starting server on port:', port);
+    console.log('🌍 Binding to 0.0.0.0 for Railway compatibility');
     
     // Railway requires binding to 0.0.0.0, not localhost
     await app.listen(port, '0.0.0.0');
-    console.log(`✅ Backend server is running on port ${port}`);
+    console.log(`🎉 Backend server is successfully running on port ${port}`);
+    console.log(`🌐 Server available at: http://0.0.0.0:${port}`);
     
-    // Keep the process alive and log any post-startup issues
-    setInterval(() => {
-      console.log('🔄 Server health check - still running...');
-    }, 30000); // Log every 30 seconds to verify server stays alive
   } catch (error) {
-    console.error('❌ Failed to start server:', error);
+    console.error('💥 Failed to start server:', error);
+    console.error('📋 Error stack:', error.stack);
     process.exit(1);
   }
 }

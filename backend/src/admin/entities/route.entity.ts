@@ -14,8 +14,22 @@ export class RouteEntity {
   @Column({ length: 100 })
   endLocation: string;
 
-  @Column('text', { array: true })
-  stops: string[];
+  @Column('text')
+  stops: string;
+
+  // Helper method to get stops as array
+  getStopsArray(): string[] {
+    try {
+      return JSON.parse(this.stops);
+    } catch {
+      return [];
+    }
+  }
+
+  // Helper method to set stops from array
+  setStopsArray(stopsArray: string[]): void {
+    this.stops = JSON.stringify(stopsArray);
+  }
 
   @Column('decimal', { precision: 5, scale: 2 })
   distance: number;

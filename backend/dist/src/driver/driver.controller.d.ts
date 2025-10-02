@@ -30,7 +30,7 @@ export declare class DriverController {
             id: number;
             username: string;
             fullName: string;
-            status: "active" | "inactive";
+            status: "inactive" | "active";
         };
     }>;
     getAvailableSchedules(): Promise<import("../admin/entities/schedule.entity").ScheduleEntity[]>;

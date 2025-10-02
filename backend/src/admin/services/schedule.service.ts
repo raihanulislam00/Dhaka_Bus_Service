@@ -132,6 +132,18 @@ export class ScheduleService {
     return await this.scheduleRepository.save(schedule);
   }
 
+  async findAvailableForBooking(): Promise<ScheduleEntity[]> {
+    return await this.scheduleRepository
+      .createQueryBuilder('schedule')
+      .leftJoinAndSelect('schedule.route', 'route')
+      .where('schedule.isActive = :isActive', { isActive: true })
+      .andWhere('route.isActive = :routeActive', { routeActive: true })
+      .andWhere('schedule.availableSeats > 0')
+      .orderBy('schedule.dayOfWeek', 'ASC')
+      .addOrderBy('schedule.departureTime', 'ASC')
+      .getMany();
+  }
+
   private async checkTimeConflict(
     busNumber: string,
     dayOfWeek: string,

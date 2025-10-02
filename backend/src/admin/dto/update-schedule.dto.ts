@@ -37,4 +37,10 @@ export class UpdateScheduleDto {
   @IsOptional()
   @IsInt()
   assignedDriverId?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(60)
+  availableSeats?: number;
 }

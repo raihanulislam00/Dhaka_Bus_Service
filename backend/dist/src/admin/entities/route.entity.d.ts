@@ -3,7 +3,9 @@ export declare class RouteEntity {
     name: string;
     startLocation: string;
     endLocation: string;
-    stops: string[];
+    stops: string;
+    getStopsArray(): string[];
+    setStopsArray(stopsArray: string[]): void;
     distance: number;
     estimatedDuration: number;
     fare: number;

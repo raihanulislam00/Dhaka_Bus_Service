@@ -28,8 +28,8 @@ export class Driver {
   age: number;
 
   @Column({
-    type: 'enum',
-    enum: ['active', 'inactive'],
+    type: 'varchar',
+    length: 20,
     default: 'inactive',
   })
   status: 'active' | 'inactive';
@@ -40,7 +40,7 @@ export class Driver {
   @Column({ type: 'decimal', precision: 11, scale: 8, nullable: true })
   currentLongitude?: number;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   lastLocationUpdate?: Date;
 
   @Column({ type: 'varchar', length: 255, nullable: true })

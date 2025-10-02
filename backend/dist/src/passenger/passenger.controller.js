@@ -16,6 +16,7 @@ exports.PassengerController = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_auth_guard_1 = require("./guards/jwt-auth.guard");
 const create_ticket_dto_1 = require("./dto/create-ticket.dto");
+const create_multiple_tickets_dto_1 = require("./dto/create-multiple-tickets.dto");
 const update_ticket_status_dto_1 = require("./dto/update-ticket-status.dto");
 const login_dto_1 = require("./dto/login.dto");
 const passenger_service_1 = require("./passenger.service");
@@ -24,10 +25,16 @@ const updatePassenger_dto_1 = require("./dto/updatePassenger.dto");
 const platform_express_1 = require("@nestjs/platform-express");
 const multer_1 = require("multer");
 const multer_2 = require("multer");
+const route_service_1 = require("../admin/services/route.service");
+const schedule_service_1 = require("../admin/services/schedule.service");
 let PassengerController = class PassengerController {
     passengerService;
-    constructor(passengerService) {
+    routeService;
+    scheduleService;
+    constructor(passengerService, routeService, scheduleService) {
         this.passengerService = passengerService;
+        this.routeService = routeService;
+        this.scheduleService = scheduleService;
     }
     async login(loginDto) {
         return await this.passengerService.login(loginDto);
@@ -35,11 +42,20 @@ let PassengerController = class PassengerController {
     async createTicket(passengerId, createTicketDto) {
         return await this.passengerService.createTicket(passengerId, createTicketDto);
     }
+    async createMultipleTickets(passengerId, createMultipleTicketsDto) {
+        return await this.passengerService.createMultipleTickets(passengerId, createMultipleTicketsDto);
+    }
     async getPassengerTickets(passengerId) {
         return await this.passengerService.getPassengerTickets(passengerId);
     }
+    async getPassengerTicketsGrouped(passengerId) {
+        return await this.passengerService.getPassengerTicketsGrouped(passengerId);
+    }
     async cancelTicket(passengerId, ticketId) {
         return await this.passengerService.cancelTicket(passengerId, ticketId);
+    }
+    async cancelBookingGroup(passengerId, bookingGroupId) {
+        return await this.passengerService.cancelBookingGroup(passengerId, bookingGroupId);
     }
     async updateTicketStatus(ticketId, updateTicketStatusDto) {
         return await this.passengerService.updateTicketStatus(ticketId, updateTicketStatusDto.status);
@@ -81,6 +97,24 @@ let PassengerController = class PassengerController {
     getPhoto(filename, res) {
         res.sendFile(filename, { root: './uploads/photos' });
     }
+    async getAvailableRoutes() {
+        return await this.routeService.findActive();
+    }
+    async searchRoutes(startLocation, endLocation) {
+        if (!startLocation && !endLocation) {
+            return await this.routeService.findActive();
+        }
+        return await this.routeService.findByLocation(startLocation, endLocation);
+    }
+    async getRouteDetails(routeId) {
+        return await this.routeService.findOne(routeId);
+    }
+    async getRouteSchedules(routeId) {
+        return await this.scheduleService.findByRoute(routeId);
+    }
+    async getAvailableSchedules() {
+        return await this.scheduleService.findAvailableForBooking();
+    }
 };
 exports.PassengerController = PassengerController;
 __decorate([
@@ -102,12 +136,29 @@ __decorate([
 ], PassengerController.prototype, "createTicket", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)(':id/tickets/multiple'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, create_multiple_tickets_dto_1.CreateMultipleTicketsDto]),
+    __metadata("design:returntype", Promise)
+], PassengerController.prototype, "createMultipleTickets", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)(':id/tickets'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], PassengerController.prototype, "getPassengerTickets", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)(':id/tickets/grouped'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], PassengerController.prototype, "getPassengerTicketsGrouped", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Delete)(':passengerId/tickets/:ticketId'),
@@ -117,6 +168,15 @@ __decorate([
     __metadata("design:paramtypes", [Number, Number]),
     __metadata("design:returntype", Promise)
 ], PassengerController.prototype, "cancelTicket", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Delete)(':passengerId/booking-groups/:bookingGroupId'),
+    __param(0, (0, common_1.Param)('passengerId', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Param)('bookingGroupId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, String]),
+    __metadata("design:returntype", Promise)
+], PassengerController.prototype, "cancelBookingGroup", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Put)('tickets/:ticketId/status'),
@@ -221,8 +281,44 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], PassengerController.prototype, "getPhoto", null);
+__decorate([
+    (0, common_1.Get)('routes/available'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], PassengerController.prototype, "getAvailableRoutes", null);
+__decorate([
+    (0, common_1.Get)('routes/search'),
+    __param(0, (0, common_1.Query)('start')),
+    __param(1, (0, common_1.Query)('end')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], PassengerController.prototype, "searchRoutes", null);
+__decorate([
+    (0, common_1.Get)('routes/:id'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], PassengerController.prototype, "getRouteDetails", null);
+__decorate([
+    (0, common_1.Get)('routes/:id/schedules'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], PassengerController.prototype, "getRouteSchedules", null);
+__decorate([
+    (0, common_1.Get)('schedules/available'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], PassengerController.prototype, "getAvailableSchedules", null);
 exports.PassengerController = PassengerController = __decorate([
     (0, common_1.Controller)('passenger'),
-    __metadata("design:paramtypes", [passenger_service_1.PassengerService])
+    __metadata("design:paramtypes", [passenger_service_1.PassengerService,
+        route_service_1.RouteService,
+        schedule_service_1.ScheduleService])
 ], PassengerController);
 //# sourceMappingURL=passenger.controller.js.map

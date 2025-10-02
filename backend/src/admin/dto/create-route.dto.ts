@@ -16,9 +16,8 @@ export class CreateRouteDto {
   @MaxLength(100)
   endLocation: string;
 
-  @IsArray()
-  @IsString({ each: true })
-  stops: string[];
+  @IsString()
+  stops: string;
 
   @IsNumber()
   @IsPositive()

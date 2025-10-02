@@ -109,6 +109,17 @@ let ScheduleService = class ScheduleService {
         schedule.isActive = !schedule.isActive;
         return await this.scheduleRepository.save(schedule);
     }
+    async findAvailableForBooking() {
+        return await this.scheduleRepository
+            .createQueryBuilder('schedule')
+            .leftJoinAndSelect('schedule.route', 'route')
+            .where('schedule.isActive = :isActive', { isActive: true })
+            .andWhere('route.isActive = :routeActive', { routeActive: true })
+            .andWhere('schedule.availableSeats > 0')
+            .orderBy('schedule.dayOfWeek', 'ASC')
+            .addOrderBy('schedule.departureTime', 'ASC')
+            .getMany();
+    }
     async checkTimeConflict(busNumber, dayOfWeek, departureTime, arrivalTime, excludeId) {
         const query = this.scheduleRepository
             .createQueryBuilder('schedule')

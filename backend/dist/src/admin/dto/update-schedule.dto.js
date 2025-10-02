@@ -20,6 +20,7 @@ class UpdateScheduleDto {
     totalSeats;
     notes;
     assignedDriverId;
+    availableSeats;
 }
 exports.UpdateScheduleDto = UpdateScheduleDto;
 __decorate([
@@ -67,4 +68,11 @@ __decorate([
     (0, class_validator_1.IsInt)(),
     __metadata("design:type", Number)
 ], UpdateScheduleDto.prototype, "assignedDriverId", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(0),
+    (0, class_validator_1.Max)(60),
+    __metadata("design:type", Number)
+], UpdateScheduleDto.prototype, "availableSeats", void 0);
 //# sourceMappingURL=update-schedule.dto.js.map

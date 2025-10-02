@@ -17,6 +17,17 @@ let RouteEntity = class RouteEntity {
     startLocation;
     endLocation;
     stops;
+    getStopsArray() {
+        try {
+            return JSON.parse(this.stops);
+        }
+        catch {
+            return [];
+        }
+    }
+    setStopsArray(stopsArray) {
+        this.stops = JSON.stringify(stopsArray);
+    }
     distance;
     estimatedDuration;
     fare;
@@ -43,8 +54,8 @@ __decorate([
     __metadata("design:type", String)
 ], RouteEntity.prototype, "endLocation", void 0);
 __decorate([
-    (0, typeorm_1.Column)('text', { array: true }),
-    __metadata("design:type", Array)
+    (0, typeorm_1.Column)('text'),
+    __metadata("design:type", String)
 ], RouteEntity.prototype, "stops", void 0);
 __decorate([
     (0, typeorm_1.Column)('decimal', { precision: 5, scale: 2 }),

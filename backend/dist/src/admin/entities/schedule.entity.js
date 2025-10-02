@@ -47,15 +47,15 @@ __decorate([
     __metadata("design:type", String)
 ], ScheduleEntity.prototype, "busNumber", void 0);
 __decorate([
-    (0, typeorm_1.Column)('time'),
+    (0, typeorm_1.Column)({ type: 'varchar', length: 10 }),
     __metadata("design:type", String)
 ], ScheduleEntity.prototype, "departureTime", void 0);
 __decorate([
-    (0, typeorm_1.Column)('time'),
+    (0, typeorm_1.Column)({ type: 'varchar', length: 10 }),
     __metadata("design:type", String)
 ], ScheduleEntity.prototype, "arrivalTime", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'enum', enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] }),
+    (0, typeorm_1.Column)({ type: 'varchar', length: 20 }),
     __metadata("design:type", String)
 ], ScheduleEntity.prototype, "dayOfWeek", void 0);
 __decorate([
