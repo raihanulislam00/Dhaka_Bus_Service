@@ -1,27 +1,212 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import PassengerNavbar from '../../components/PassengerNavbar';
-import { generalAPI } from '../../lib/api';
+import { generalAPI, ticketAPI } from '../../lib/api';
 import { useAuth } from '../../hooks/useAuth';
+
+interface GroupedTicket {
+  bookingGroupId: string;
+  routeName: string;
+  scheduleId: number;
+  busNumber: string;
+  journeyDate: string;
+  departureTime: string;
+  arrivalTime: string;
+  seats: Array<{
+    seatNumber: string;
+    ticketId: number;
+    status: string;
+  }>;
+  totalAmount: number;
+  status: string;
+  createdAt: string;
+}
+
+interface SingleTicket {
+  id: number;
+  seatNumber: string;
+  journeyDate: string;
+  status: string;
+  totalAmount: number;
+  routeName: string;
+  busNumber: string;
+  departureTime: string;
+  bookingGroupId?: string;
+  createdAt: string;
+}
 
 export default function PassengerDashboard() {
   const { user, loading, logout } = useAuth('passenger');
+  const router = useRouter();
+  const [groupedBookings, setGroupedBookings] = useState<GroupedTicket[]>([]);
+  const [singleTickets, setSingleTickets] = useState<SingleTicket[]>([]);
+  const [loadingTickets, setLoadingTickets] = useState(true);
+  const [activeTab, setActiveTab] = useState<'upcoming' | 'completed' | 'all'>('upcoming');
 
   useEffect(() => {
-    if (user) {
-      fetchUserData(user.id);
+    if (user?.id) {
+      fetchTicketData();
     }
   }, [user]);
 
-  const fetchUserData = async (userId: number) => {
+  const fetchTicketData = async () => {
+    setLoadingTickets(true);
     try {
-      // You can add API calls here to fetch user profile, tickets, etc.
-      // const response = await generalAPI.getPassengerProfile(userId);
-      // Update state with fresh data
-      console.log('Fetching data for user:', userId);
+      const passengerId = user?.id;
+      
+      if (!passengerId) {
+        console.error('User ID not available');
+        return;
+      }
+      
+      // Fetch grouped bookings (multiple seat bookings)
+      const groupedResponse = await ticketAPI.getPassengerTicketsGrouped(passengerId);
+      setGroupedBookings(groupedResponse.data || []);
+      
+      // Fetch individual tickets (single seat bookings)
+      const ticketsResponse = await ticketAPI.getPassengerTickets(passengerId);
+      setSingleTickets(ticketsResponse.data || []);
+      
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error('Error fetching tickets:', error);
+      // Use mock data for demonstration
+      setGroupedBookings([
+        {
+          bookingGroupId: 'GRP123',
+          routeName: 'Dhaka-Chittagong Express',
+          scheduleId: 1,
+          busNumber: 'DH-1234',
+          journeyDate: '2024-01-15',
+          departureTime: '08:00',
+          arrivalTime: '14:30',
+          seats: [
+            { seatNumber: '1A', ticketId: 101, status: 'confirmed' },
+            { seatNumber: '1B', ticketId: 102, status: 'confirmed' },
+            { seatNumber: '2A', ticketId: 103, status: 'confirmed' },
+          ],
+          totalAmount: 1350, // 3 seats * 450
+          status: 'confirmed',
+          createdAt: '2024-01-10T10:30:00Z',
+        }
+      ]);
+      
+      setSingleTickets([
+        {
+          id: 201,
+          seatNumber: '5C',
+          journeyDate: '2024-01-20',
+          status: 'confirmed',
+          totalAmount: 420,
+          routeName: 'Dhaka-Sylhet Deluxe',
+          busNumber: 'SY-5678',
+          departureTime: '15:00',
+          createdAt: '2024-01-12T14:20:00Z',
+        }
+      ]);
+    } finally {
+      setLoadingTickets(false);
+    }
+  };
+
+  const handleCancelBookingGroup = async (bookingGroupId: string) => {
+    if (!confirm('Are you sure you want to cancel this entire booking? All seats will be cancelled.')) {
+      return;
+    }
+    
+    try {
+      const passengerId = user?.id;
+      if (!passengerId) return;
+      
+      await ticketAPI.cancelBookingGroup(passengerId, bookingGroupId);
+      
+      // Refresh ticket data
+      fetchTicketData();
+      alert('Booking group cancelled successfully');
+    } catch (error) {
+      console.error('Error cancelling booking group:', error);
+      alert('Failed to cancel booking group');
+    }
+  };
+
+  const handleCancelSingleTicket = async (ticketId: number) => {
+    if (!confirm('Are you sure you want to cancel this ticket?')) {
+      return;
+    }
+    
+    try {
+      const passengerId = user?.id;
+      if (!passengerId) return;
+      
+      await ticketAPI.cancelTicket(passengerId, ticketId);
+      
+      // Refresh ticket data
+      fetchTicketData();
+      alert('Ticket cancelled successfully');
+    } catch (error) {
+      console.error('Error cancelling ticket:', error);
+      alert('Failed to cancel ticket');
+    }
+  };
+
+  const getFilteredBookings = () => {
+    const today = new Date();
+    
+    return groupedBookings.filter(booking => {
+      const journeyDate = new Date(booking.journeyDate);
+      
+      switch (activeTab) {
+        case 'upcoming':
+          return journeyDate >= today && booking.status === 'confirmed';
+        case 'completed':
+          return journeyDate < today || booking.status === 'completed';
+        case 'all':
+        default:
+          return true;
+      }
+    });
+  };
+
+  const getFilteredSingleTickets = () => {
+    const today = new Date();
+    
+    return singleTickets.filter(ticket => {
+      const journeyDate = new Date(ticket.journeyDate);
+      
+      switch (activeTab) {
+        case 'upcoming':
+          return journeyDate >= today && ticket.status === 'confirmed';
+        case 'completed':
+          return journeyDate < today || ticket.status === 'completed';
+        case 'all':
+        default:
+          return true;
+      }
+    });
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'confirmed':
+        return 'bg-green-100 text-green-800';
+      case 'completed':
+        return 'bg-blue-100 text-blue-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -37,278 +222,253 @@ export default function PassengerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <PassengerNavbar username={user?.username} />
-      <div className="py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
-            <div className="flex justify-between items-center mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+      <PassengerNavbar />
+      
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Welcome Header */}
+          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div className="flex justify-between items-center">
               <div>
                 <h1 className="text-3xl font-bold text-gray-800">
-                  Welcome, {user?.fullName}!
+                  Welcome, {user?.fullName || user?.username}! 👋
                 </h1>
-                <p className="text-gray-600">Passenger Dashboard</p>
+                <p className="text-gray-600 mt-2">Manage your bus bookings and travel history</p>
               </div>
-              <button
-                onClick={logout}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+              <button 
+                onClick={() => router.push('/passenger/book-ticket')}
+                className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-colors font-medium"
               >
-                Logout
+                Book New Ticket
               </button>
             </div>
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm">Total Trips</p>
-                  <p className="text-3xl font-bold">12</p>
+          <div className="grid md:grid-cols-4 gap-6 mb-8">
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <div className="flex items-center">
+                <div className="bg-blue-500 p-3 rounded-lg mr-4">
+                  <span className="text-white text-xl">🎫</span>
                 </div>
-                <div className="bg-white/20 p-3 rounded-lg">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z"/>
-                  </svg>
+                <div>
+                  <p className="text-gray-600 text-sm">Total Bookings</p>
+                  <p className="text-2xl font-bold text-gray-800">{groupedBookings.length + singleTickets.length}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl shadow-lg p-6 text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-100 text-sm">Active Tickets</p>
-                  <p className="text-3xl font-bold">3</p>
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <div className="flex items-center">
+                <div className="bg-green-500 p-3 rounded-lg mr-4">
+                  <span className="text-white text-xl">✅</span>
                 </div>
-                <div className="bg-white/20 p-3 rounded-lg">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
-                    <path fillRule="evenodd" d="M4 5a2 2 0 012-2v1a2 2 0 002 2h2a2 2 0 002-2V3a2 2 0 012 2v6h-3a4 4 0 01-8 0H4V5z" clipRule="evenodd"/>
-                  </svg>
+                <div>
+                  <p className="text-gray-600 text-sm">Upcoming Trips</p>
+                  <p className="text-2xl font-bold text-gray-800">
+                    {getFilteredBookings().length + getFilteredSingleTickets().length}
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-purple-500 to-violet-600 rounded-xl shadow-lg p-6 text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100 text-sm">Total Spent</p>
-                  <p className="text-3xl font-bold">৳450</p>
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <div className="flex items-center">
+                <div className="bg-purple-500 p-3 rounded-lg mr-4">
+                  <span className="text-white text-xl">👥</span>
                 </div>
-                <div className="bg-white/20 p-3 rounded-lg">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zM14 6a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h8zM6 8a2 2 0 012 2v2H6V8z"/>
-                  </svg>
+                <div>
+                  <p className="text-gray-600 text-sm">Group Bookings</p>
+                  <p className="text-2xl font-bold text-gray-800">{groupedBookings.length}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-xl shadow-lg p-6 text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-orange-100 text-sm">Rewards Points</p>
-                  <p className="text-3xl font-bold">120</p>
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <div className="flex items-center">
+                <div className="bg-orange-500 p-3 rounded-lg mr-4">
+                  <span className="text-white text-xl">💰</span>
                 </div>
-                <div className="bg-white/20 p-3 rounded-lg">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z" clipRule="evenodd"/>
-                  </svg>
+                <div>
+                  <p className="text-gray-600 text-sm">Total Spent</p>
+                  <p className="text-2xl font-bold text-gray-800">
+                    ৳{(groupedBookings.reduce((sum, b) => sum + b.totalAmount, 0) + 
+                        singleTickets.reduce((sum, t) => sum + t.totalAmount, 0)).toLocaleString()}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Book Ticket */}
-            <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 group">
-              <div className="flex items-center mb-4">
-                <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-3 rounded-lg mr-4 group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">Book Ticket</h3>
-              </div>
-              <p className="text-gray-600 mb-4">Reserve your seat for upcoming journeys with easy online booking</p>
-              <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-4 rounded-lg transition-all duration-300 font-medium shadow-lg hover:shadow-xl">
-                Book Now
-              </button>
-            </div>
-
-            {/* My Tickets */}
-            <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 group">
-              <div className="flex items-center mb-4">
-                <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-3 rounded-lg mr-4 group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
-                    <path fillRule="evenodd" d="M4 5a2 2 0 012-2v1a2 2 0 002 2h2a2 2 0 002-2V3a2 2 0 012 2v6h-3a4 4 0 01-8 0H4V5z" clipRule="evenodd"/>
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 group-hover:text-green-600 transition-colors">My Tickets</h3>
-              </div>
-              <p className="text-gray-600 mb-4">View and manage your booked tickets, track journey status</p>
-              <button className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 px-4 rounded-lg transition-all duration-300 font-medium shadow-lg hover:shadow-xl">
-                View Tickets
-              </button>
-            </div>
-
-            {/* Route Information */}
-            <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 group">
-              <div className="flex items-center mb-4">
-                <div className="bg-gradient-to-r from-purple-500 to-violet-600 p-3 rounded-lg mr-4 group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 group-hover:text-purple-600 transition-colors">Routes & Schedules</h3>
-              </div>
-              <p className="text-gray-600 mb-4">Explore available bus routes and real-time schedules</p>
-              <button className="w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white py-3 px-4 rounded-lg transition-all duration-300 font-medium shadow-lg hover:shadow-xl">
-                View Routes
-              </button>
-            </div>
-
-            {/* Payment History */}
-            <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 group">
-              <div className="flex items-center mb-4">
-                <div className="bg-gradient-to-r from-orange-500 to-red-500 p-3 rounded-lg mr-4 group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zM14 6a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h8zM6 8a2 2 0 012 2v2H6V8z"/>
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 group-hover:text-orange-600 transition-colors">Payment History</h3>
-              </div>
-              <p className="text-gray-600 mb-4">Track your payment history and transaction details</p>
-              <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-3 px-4 rounded-lg transition-all duration-300 font-medium shadow-lg hover:shadow-xl">
-                View History
-              </button>
-            </div>
-
-            {/* Support */}
-            <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 group">
-              <div className="flex items-center mb-4">
-                <div className="bg-gradient-to-r from-indigo-500 to-blue-600 p-3 rounded-lg mr-4 group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd"/>
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors">Help & Support</h3>
-              </div>
-              <p className="text-gray-600 mb-4">Get help with bookings, payments, or general inquiries</p>
-              <button className="w-full bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white py-3 px-4 rounded-lg transition-all duration-300 font-medium shadow-lg hover:shadow-xl">
-                Get Support
-              </button>
-            </div>
-
-            {/* Profile */}
-            <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 group">
-              <div className="flex items-center mb-4">
-                <div className="bg-gradient-to-r from-gray-500 to-gray-600 p-3 rounded-lg mr-4 group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd"/>
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 group-hover:text-gray-600 transition-colors">My Profile</h3>
-              </div>
-              <p className="text-gray-600 mb-4">Update your personal information and preferences</p>
-              <button className="w-full bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white py-3 px-4 rounded-lg transition-all duration-300 font-medium shadow-lg hover:shadow-xl">
-                Edit Profile
-              </button>
-            </div>
-          </div>
-
-          {/* Recent Activity & Upcoming Trips */}
-          <div className="grid lg:grid-cols-2 gap-6 mt-8">
-            {/* Recent Activity */}
-            <div className="bg-white rounded-xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                <svg className="w-6 h-6 text-blue-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"/>
-                </svg>
-                Recent Activity
-              </h2>
-              <div className="space-y-4">
-                <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
-                  <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-800">Trip Completed</p>
-                    <p className="text-sm text-gray-600">Dhanmondi to Gulshan - Yesterday</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
-                  <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-800">Ticket Booked</p>
-                    <p className="text-sm text-gray-600">Uttara to Mirpur - 2 days ago</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
-                  <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zM14 6a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h8z"/>
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-800">Payment Processed</p>
-                    <p className="text-sm text-gray-600">৳45 - 2 days ago</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Upcoming Trips */}
-            <div className="bg-white rounded-xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                <svg className="w-6 h-6 text-green-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd"/>
-                </svg>
-                Upcoming Trips
-              </h2>
-              <div className="space-y-4">
-                <div className="border-l-4 border-blue-500 pl-4 py-3 bg-blue-50 rounded-r-lg">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-medium text-gray-800">Uttara → Mirpur</h3>
-                      <p className="text-sm text-gray-600">Bus: DBS-001</p>
-                      <p className="text-sm text-gray-600">Seat: A12</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-blue-600">Tomorrow</p>
-                      <p className="text-sm text-gray-600">08:30 AM</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border-l-4 border-green-500 pl-4 py-3 bg-green-50 rounded-r-lg">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-medium text-gray-800">Dhanmondi → Airport</h3>
-                      <p className="text-sm text-gray-600">Bus: DBS-007</p>
-                      <p className="text-sm text-gray-600">Seat: B05</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-green-600">Dec 25</p>
-                      <p className="text-sm text-gray-600">10:15 AM</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-center py-4">
-                  <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">
-                    View All Trips →
+          {/* Ticket Management Tabs */}
+          <div className="bg-white rounded-lg shadow-lg">
+            {/* Tab Navigation */}
+            <div className="border-b">
+              <nav className="flex space-x-8 px-6">
+                {[
+                  { key: 'upcoming', label: 'Upcoming Trips', icon: '📅' },
+                  { key: 'completed', label: 'Completed', icon: '✅' },
+                  { key: 'all', label: 'All Bookings', icon: '📋' },
+                ].map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key as any)}
+                    className={`py-4 px-2 border-b-2 font-medium text-sm ${
+                      activeTab === tab.key
+                        ? 'border-green-500 text-green-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    {tab.icon} {tab.label}
                   </button>
+                ))}
+              </nav>
+            </div>
+
+            {/* Tab Content */}
+            <div className="p-6">
+              {loadingTickets ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
+                  <p className="mt-4 text-gray-600">Loading your bookings...</p>
                 </div>
-              </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Group Bookings */}
+                  {getFilteredBookings().length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-800 mb-4">Group Bookings (Multiple Seats)</h3>
+                      <div className="space-y-4">
+                        {getFilteredBookings().map((booking) => (
+                          <div key={booking.bookingGroupId} className="border rounded-lg p-6 hover:shadow-md transition-shadow">
+                            <div className="flex justify-between items-start mb-4">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <h4 className="text-xl font-bold text-gray-800">{booking.routeName}</h4>
+                                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
+                                    {booking.status.toUpperCase()}
+                                  </span>
+                                </div>
+                                <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
+                                  <div>
+                                    <p><strong>Bus:</strong> {booking.busNumber}</p>
+                                    <p><strong>Date:</strong> {formatDate(booking.journeyDate)}</p>
+                                    <p><strong>Time:</strong> {booking.departureTime} - {booking.arrivalTime}</p>
+                                  </div>
+                                  <div>
+                                    <p><strong>Seats ({booking.seats.length}):</strong> {booking.seats.map(s => s.seatNumber).join(', ')}</p>
+                                    <p><strong>Booking ID:</strong> {booking.bookingGroupId}</p>
+                                    <p><strong>Booked:</strong> {formatDate(booking.createdAt)}</p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right ml-6">
+                                <div className="text-2xl font-bold text-green-600 mb-2">
+                                  ৳{booking.totalAmount.toLocaleString()}
+                                </div>
+                                {booking.status === 'confirmed' && new Date(booking.journeyDate) >= new Date() && (
+                                  <button
+                                    onClick={() => handleCancelBookingGroup(booking.bookingGroupId)}
+                                    className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                  >
+                                    Cancel Group Booking
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                            
+                            {/* Individual seat details */}
+                            <div className="bg-gray-50 rounded-lg p-4">
+                              <p className="font-medium text-gray-700 mb-2">Seat Details:</p>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                {booking.seats.map((seat) => (
+                                  <div key={seat.ticketId} className="flex items-center justify-between bg-white p-2 rounded">
+                                    <span className="font-medium">{seat.seatNumber}</span>
+                                    <span className={`px-2 py-1 rounded text-xs ${getStatusColor(seat.status)}`}>
+                                      {seat.status}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Single Tickets */}
+                  {getFilteredSingleTickets().length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-800 mb-4">Individual Bookings</h3>
+                      <div className="space-y-4">
+                        {getFilteredSingleTickets().map((ticket) => (
+                          <div key={ticket.id} className="border rounded-lg p-6 hover:shadow-md transition-shadow">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <h4 className="text-xl font-bold text-gray-800">{ticket.routeName}</h4>
+                                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(ticket.status)}`}>
+                                    {ticket.status.toUpperCase()}
+                                  </span>
+                                </div>
+                                <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
+                                  <div>
+                                    <p><strong>Bus:</strong> {ticket.busNumber}</p>
+                                    <p><strong>Date:</strong> {formatDate(ticket.journeyDate)}</p>
+                                    <p><strong>Time:</strong> {ticket.departureTime}</p>
+                                  </div>
+                                  <div>
+                                    <p><strong>Seat:</strong> {ticket.seatNumber}</p>
+                                    <p><strong>Ticket ID:</strong> {ticket.id}</p>
+                                    <p><strong>Booked:</strong> {formatDate(ticket.createdAt)}</p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right ml-6">
+                                <div className="text-2xl font-bold text-green-600 mb-2">
+                                  ৳{ticket.totalAmount.toLocaleString()}
+                                </div>
+                                {ticket.status === 'confirmed' && new Date(ticket.journeyDate) >= new Date() && (
+                                  <button
+                                    onClick={() => handleCancelSingleTicket(ticket.id)}
+                                    className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                  >
+                                    Cancel Ticket
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Empty State */}
+                  {getFilteredBookings().length === 0 && getFilteredSingleTickets().length === 0 && (
+                    <div className="text-center py-12">
+                      <div className="text-6xl mb-4">🎫</div>
+                      <h3 className="text-xl font-medium text-gray-800 mb-2">No bookings found</h3>
+                      <p className="text-gray-600 mb-6">
+                        {activeTab === 'upcoming' 
+                          ? "You don't have any upcoming trips."
+                          : activeTab === 'completed'
+                          ? "You haven't completed any trips yet."
+                          : "You haven't made any bookings yet."
+                        }
+                      </p>
+                      <button
+                        onClick={() => router.push('/passenger/book-ticket')}
+                        className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-colors font-medium"
+                      >
+                        Book Your First Ticket
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

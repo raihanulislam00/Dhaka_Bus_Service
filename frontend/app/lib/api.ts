@@ -70,4 +70,47 @@ export const generalAPI = {
   getDriverLocation: (id: number) => api.get(`/admin/drivers/${id}/location`),
 };
 
+// Route and Booking APIs
+export const routeAPI = {
+  // Get available routes for passengers
+  getAvailableRoutes: () => api.get('/passenger/routes/available'),
+  searchRoutes: (start?: string, end?: string) => api.get('/passenger/routes/search', { 
+    params: { start, end } 
+  }),
+  getRouteDetails: (routeId: number) => api.get(`/passenger/routes/${routeId}`),
+  getRouteSchedules: (routeId: number) => api.get(`/passenger/routes/${routeId}/schedules`),
+  getAvailableSchedules: () => api.get('/passenger/schedules/available'),
+};
+
+// Ticket Booking APIs
+export const ticketAPI = {
+  // Single ticket booking
+  createTicket: (passengerId: number, ticketData: any) => 
+    api.post(`/passenger/${passengerId}/tickets`, ticketData),
+  
+  // Multiple seats booking
+  createMultipleTickets: (passengerId: number, bookingData: any) => 
+    api.post(`/passenger/${passengerId}/tickets/multiple`, bookingData),
+  
+  // Get passenger tickets
+  getPassengerTickets: (passengerId: number) => 
+    api.get(`/passenger/${passengerId}/tickets`),
+  
+  // Get grouped tickets (for multiple seat bookings)
+  getPassengerTicketsGrouped: (passengerId: number) => 
+    api.get(`/passenger/${passengerId}/tickets/grouped`),
+  
+  // Cancel single ticket
+  cancelTicket: (passengerId: number, ticketId: number) => 
+    api.delete(`/passenger/${passengerId}/tickets/${ticketId}`),
+  
+  // Cancel entire booking group
+  cancelBookingGroup: (passengerId: number, bookingGroupId: string) => 
+    api.delete(`/passenger/${passengerId}/booking-groups/${bookingGroupId}`),
+  
+  // Update ticket status
+  updateTicketStatus: (ticketId: number, status: string) => 
+    api.put(`/passenger/tickets/${ticketId}/status`, { status }),
+};
+
 export default api;
