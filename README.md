@@ -675,14 +675,26 @@ PUT  /driver/trips/:id/status  # Update trip status
 
 <div align="center">
 
-| Component | Progress | Status |
-|-----------|----------|--------|
-| 🎨 **Frontend** | ![Frontend](https://progress-bar.dev/88/?width=200&color=61dafb) | `88%` |
-| ⚡ **Backend** | ![Backend](https://progress-bar.dev/92/?width=200&color=e0234e) | `92%` |
-| 🗄️ **Database** | ![Database](https://progress-bar.dev/95/?width=200&color=336791) | `95%` |
-| 🧪 **Testing** | ![Testing](https://progress-bar.dev/65/?width=200&color=99424f) | `65%` |
-| 📱 **Mobile** | ![Mobile](https://progress-bar.dev/45/?width=200&color=20232a) | `45%` |
-| 📚 **Documentation** | ![Docs](https://progress-bar.dev/90/?width=200&color=4cae4c) | `90%` |
+| Component | Progress | Status | Details |
+|-----------|----------|--------|---------|
+| 🎨 **Frontend** | ![Frontend](https://progress-bar.dev/88/?width=300&color=61dafb&title=Next.js%20+%20React) | **88%** | UI Components, Responsive Design |
+| ⚡ **Backend** | ![Backend](https://progress-bar.dev/92/?width=300&color=e0234e&title=NestJS%20+%20TypeScript) | **92%** | APIs, Authentication, Services |
+| 🗄️ **Database** | ![Database](https://progress-bar.dev/95/?width=300&color=336791&title=SQLite%20+%20TypeORM) | **95%** | Schema, Relations, Migrations |
+| 🧪 **Testing** | ![Testing](https://progress-bar.dev/65/?width=300&color=99424f&title=Jest%20+%20Cypress) | **65%** | Unit Tests, E2E Coverage |
+| 📱 **Mobile** | ![Mobile](https://progress-bar.dev/45/?width=300&color=20232a&title=PWA%20+%20Responsive) | **45%** | Mobile Optimization, PWA |
+| 📚 **Documentation** | ![Docs](https://progress-bar.dev/90/?width=300&color=4cae4c&title=README%20+%20API%20Docs) | **90%** | README, API Documentation |
+
+</div>
+
+<div align="center">
+
+### 🚀 Overall Project Health
+
+[![Overall Progress](https://progress-bar.dev/85/?scale=100&title=Project%20Completion&suffix=%&width=600&color=babaca)](https://github.com/raihanulislam00/Dhaka_Bus_Service)
+
+**🎯 Current Focus:** Payment Integration & Real-time Features  
+**⏱️ Next Milestone:** v1.3 Release - December 2025  
+**👥 Active Contributors:** 5+ developers  
 
 </div>
 
