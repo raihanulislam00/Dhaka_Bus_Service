@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import AdminNavbar from '../../components/AdminNavbar';
+import Link from 'next/link';
+import AdminLayout from '../../components/AdminLayout';
 
 interface Passenger {
   id: number;
@@ -258,18 +259,16 @@ export default function ManagePassengers() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <AdminNavbar />
+      <AdminLayout>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-xl">Loading passengers...</div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <AdminNavbar username={user?.username} />
+    <AdminLayout>
       
       <div className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -529,6 +528,6 @@ export default function ManagePassengers() {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 interface PassengerNavbarProps {
@@ -24,6 +25,7 @@ export default function PassengerNavbar({ username }: PassengerNavbarProps) {
   }, []);
 
   const handleLogout = () => {
+    console.log('🚪 PassengerNavbar: Logout clicked');
     // Clear user data from localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('userType');
@@ -63,6 +65,15 @@ export default function PassengerNavbar({ username }: PassengerNavbarProps) {
       )
     },
     { 
+      href: '/passenger/route-maps', 
+      label: 'Route Maps', 
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clipRule="evenodd"/>
+        </svg>
+      )
+    },
+    { 
       href: '/passenger/profile', 
       label: 'Profile', 
       icon: (
@@ -80,10 +91,14 @@ export default function PassengerNavbar({ username }: PassengerNavbarProps) {
           {/* Logo and Title */}
           <div className="flex items-center">
             <Link href="/passenger/dashboard" className="flex items-center space-x-3 group">
-              <div className="bg-white/10 backdrop-blur-sm text-white p-3 rounded-xl group-hover:bg-white/20 transition-all duration-300 group-hover:scale-105">
-                <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z"/>
-                </svg>
+              <div className="bg-white/90 backdrop-blur-sm text-white p-2 rounded-xl group-hover:bg-white transition-all duration-300 group-hover:scale-105">
+                <Image 
+                  src="/logo.svg" 
+                  alt="Dhaka Bus Service Logo" 
+                  width={32} 
+                  height={32}
+                  className="w-8 h-8"
+                />
               </div>
               <div>
                 <span className="text-white font-bold text-xl tracking-wide">Passenger Portal</span>

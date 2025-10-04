@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 interface DriverNavbarProps {
@@ -89,10 +90,14 @@ export default function DriverNavbar({ username }: DriverNavbarProps) {
           {/* Logo and Title */}
           <div className="flex items-center">
             <Link href="/driver/dashboard" className="flex items-center space-x-3 group">
-              <div className="bg-white/10 backdrop-blur-sm text-white p-3 rounded-xl group-hover:bg-white/20 transition-all duration-300 group-hover:scale-105">
-                <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z"/>
-                </svg>
+              <div className="bg-white/90 backdrop-blur-sm text-white p-2 rounded-xl group-hover:bg-white transition-all duration-300 group-hover:scale-105">
+                <Image 
+                  src="/logo.svg" 
+                  alt="Dhaka Bus Service Logo" 
+                  width={32} 
+                  height={32}
+                  className="w-8 h-8"
+                />
               </div>
               <div>
                 <span className="text-white font-bold text-xl tracking-wide">Driver Portal</span>

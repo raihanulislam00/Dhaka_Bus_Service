@@ -25,11 +25,24 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('token');
-      localStorage.removeItem('userType');
-      localStorage.removeItem('user');
-      window.location.href = '/';
+      // Only clear auth data if it's actually an auth-related error
+      // Don't clear on booking errors or other non-auth 401s
+      const isAuthError = error.response?.data?.message?.includes('token') || 
+                         error.response?.data?.message?.includes('unauthorized') ||
+                         error.response?.data?.message?.includes('authentication');
+      
+      if (isAuthError) {
+        console.log('Authentication error detected, clearing tokens');
+        localStorage.removeItem('token');
+        localStorage.removeItem('userType');
+        localStorage.removeItem('user');
+        // Only redirect if we're not already on a login page
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/';
+        }
+      } else {
+        console.log('401 error but not auth-related:', error.response?.data);
+      }
     }
     return Promise.reject(error);
   }

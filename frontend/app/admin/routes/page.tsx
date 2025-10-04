@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import AdminNavbar from '../../components/AdminNavbar';
+import AdminLayout from '../../components/AdminLayout';
 import api from '../../lib/api';
 
 interface Route {
@@ -10,7 +10,7 @@ interface Route {
   name: string;
   startLocation: string;
   endLocation: string;
-  stops: string[];
+  stops: string[] | string | null;
   distance: number;
   estimatedDuration: number;
   fare: number;
@@ -25,6 +25,29 @@ export default function RouteManagement() {
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingRoute, setEditingRoute] = useState<Route | null>(null);
+
+  // Helper function to safely handle stops data
+  const getStopsArray = (stops: string[] | string | null): string[] => {
+    if (Array.isArray(stops)) {
+      return stops;
+    }
+    if (typeof stops === 'string') {
+      // If it's a string, try to parse it or split it
+      try {
+        const parsed = JSON.parse(stops);
+        return Array.isArray(parsed) ? parsed : [stops];
+      } catch {
+        // If JSON parsing fails, treat as comma-separated string
+        return stops.split(',').map(stop => stop.trim()).filter(stop => stop);
+      }
+    }
+    return [];
+  };
+
+  const getStopsDisplay = (stops: string[] | string | null): string => {
+    const stopsArray = getStopsArray(stops);
+    return stopsArray.length > 0 ? stopsArray.join(' → ') : 'No stops defined';
+  };
   const [formData, setFormData] = useState({
     name: '',
     startLocation: '',
@@ -108,11 +131,12 @@ export default function RouteManagement() {
 
   const handleEdit = (route: Route) => {
     setEditingRoute(route);
+    const stopsArray = getStopsArray(route.stops);
     setFormData({
       name: route.name,
       startLocation: route.startLocation,
       endLocation: route.endLocation,
-      stops: route.stops.length > 0 ? route.stops : [''],
+      stops: stopsArray.length > 0 ? stopsArray : [''],
       distance: route.distance.toString(),
       estimatedDuration: route.estimatedDuration.toString(),
       fare: route.fare.toString(),
@@ -179,19 +203,16 @@ export default function RouteManagement() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <AdminNavbar />
+      <AdminLayout>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <AdminNavbar />
-      
+    <AdminLayout>
       <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Route Management</h1>
@@ -402,7 +423,9 @@ export default function RouteManagement() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-gray-900">{route.name}</div>
-                        <div className="text-sm text-gray-500">{route.stops.join(' → ')}</div>
+                        <div className="text-sm text-gray-500">
+                          {getStopsDisplay(route.stops)}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -458,6 +481,6 @@ export default function RouteManagement() {
           )}
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }

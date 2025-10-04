@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import DriverNavbar from '../../components/DriverNavbar';
+import DriverLayout from '../../components/DriverLayout';
 
 interface Trip {
   id: number;
@@ -308,19 +308,16 @@ export default function DriverTrips() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <DriverNavbar />
+      <DriverLayout>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-xl">Loading trips...</div>
+          <div className="text-xl">Loading...</div>
         </div>
-      </div>
+      </DriverLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DriverNavbar username={user?.username} />
-      
+    <DriverLayout>
       <div className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
@@ -628,6 +625,6 @@ export default function DriverTrips() {
           </div>
         </div>
       )}
-    </div>
+    </DriverLayout>
   );
 }

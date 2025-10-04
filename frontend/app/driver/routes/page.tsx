@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import DriverNavbar from '../../components/DriverNavbar';
+import DriverLayout from '../../components/DriverLayout';
 
 interface Route {
   id: number;
   name: string;
   startLocation: string;
   endLocation: string;
-  stops: string[];
+  stops: string; // API returns comma-separated string
   distance: number | string;
   estimatedDuration: number;
   fare: number | string;
@@ -106,7 +106,7 @@ export default function DriverRoutes() {
         route.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         route.startLocation.toLowerCase().includes(searchTerm.toLowerCase()) ||
         route.endLocation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        route.stops.some(stop => stop.toLowerCase().includes(searchTerm.toLowerCase()))
+        route.stops.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredRoutes(filtered);
     }
@@ -138,18 +138,16 @@ export default function DriverRoutes() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <DriverNavbar />
+      <DriverLayout>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-xl">Loading routes...</div>
+          <div className="text-xl">Loading...</div>
         </div>
-      </div>
+      </DriverLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DriverNavbar username={user?.username} />
+    <DriverLayout>
       
       <div className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -248,7 +246,7 @@ export default function DriverRoutes() {
 
                   <div className="flex justify-between items-center">
                     <div className="text-xs text-gray-500">
-                      {route.stops.length} stops
+                      {route.stops.split(',').length} stops
                     </div>
                     <button
                       onClick={() => viewRouteDetails(route)}
@@ -344,15 +342,15 @@ export default function DriverRoutes() {
 
                 <div className="space-y-4">
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="font-semibold text-gray-800 mb-3">Bus Stops ({selectedRoute.stops.length})</h4>
+                    <h4 className="font-semibold text-gray-800 mb-3">Bus Stops ({selectedRoute.stops.split(',').length})</h4>
                     <div className="max-h-40 overflow-y-auto">
                       <ol className="space-y-2">
-                        {selectedRoute.stops.map((stop, index) => (
+                        {selectedRoute.stops.split(',').map((stop, index) => (
                           <li key={index} className="flex items-center">
                             <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center mr-3">
                               {index + 1}
                             </span>
-                            <span className="text-sm text-gray-700">{stop}</span>
+                            <span className="text-sm text-gray-700">{stop.trim()}</span>
                           </li>
                         ))}
                       </ol>
@@ -378,6 +376,6 @@ export default function DriverRoutes() {
           </div>
         </div>
       )}
-    </div>
+    </DriverLayout>
   );
 }
